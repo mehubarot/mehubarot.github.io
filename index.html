@@ -2274,12 +2274,43 @@ const DATA = [{"name": "מיכל טייטל", "phone": "052-882-7817", "city": "
 const search = document.getElementById('search');
 const count = document.getElementById('count');
 const cards = Array.from(document.querySelectorAll('.card'));
+const grid = document.getElementById('grid');
 let activeFilter = 'all';
 let currentShareText = '';
 
 function normalize(v){ return String(v || '').toLowerCase().replace(/\s+/g,' ').trim(); }
 
+
+function getCardName(card){
+  const el = card.querySelector('.name');
+  return el ? el.textContent.trim() : '';
+}
+
+function sortCardsForCurrentFilter(){
+  const priority = {
+    'מיכל טייטל': 0,
+    'שני ויינרייך': 1,
+    'שני שפלן': 2
+  };
+
+  const sorted = [...cards].sort((a,b) => {
+    const nameA = getCardName(a);
+    const nameB = getCardName(b);
+
+    if(activeFilter === 'all'){
+      const pa = Object.prototype.hasOwnProperty.call(priority, nameA) ? priority[nameA] : 999;
+      const pb = Object.prototype.hasOwnProperty.call(priority, nameB) ? priority[nameB] : 999;
+      if(pa !== pb) return pa - pb;
+    }
+
+    return nameA.localeCompare(nameB, 'he');
+  });
+
+  sorted.forEach(card => grid.appendChild(card));
+}
+
 function applyFilters(){
+  sortCardsForCurrentFilter();
   const q = (search.value || '').trim().toLowerCase();
   let shown = 0;
 
